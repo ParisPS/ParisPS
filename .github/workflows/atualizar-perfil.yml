@@ -1,0 +1,61 @@
+# Gera as imagens "vivas" do perfil (estatísticas, linguagens e a cobrinha)
+# e salva tudo na pasta profile/ deste próprio repositório.
+#
+# Por que assim? Os tutoriais antigos apontam para servidores públicos
+# (ex.: github-readme-stats.vercel.app) que vivem estourando limite de uso,
+# e aí o card aparece quebrado. Gerando aqui, as imagens ficam no SEU repo.
+
+name: Atualizar perfil
+
+on:
+  schedule:
+    - cron: "0 3 * * *"   # todo dia às 03:00 UTC (meia-noite no horário de Brasília)
+  workflow_dispatch:       # cria o botão "Run workflow" na aba Actions
+  push:
+    branches: [main]       # roda também quando você mexe no repositório
+
+permissions:
+  contents: write          # o workflow precisa de permissão para commitar os SVGs
+
+jobs:
+  gerar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o repositório
+        uses: actions/checkout@v6
+
+      # O nome de usuário vem de github.repository_owner, então
+      # você não precisa escrever seu usuário em lugar nenhum aqui.
+      - name: Card de estatísticas
+        uses: stats-organization/github-readme-stats-action@v2
+        with:
+          card: stats
+          options: username=${{ github.repository_owner }}&show_icons=true&locale=pt-br&hide_border=true&border_radius=14&bg_color=0a1a2f&title_color=7fd8ff&icon_color=7fd8ff&ring_color=7fd8ff&text_color=d7e6f5
+          path: profile/stats.svg
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Card de linguagens
+        uses: stats-organization/github-readme-stats-action@v2
+        with:
+          card: top-langs
+          options: username=${{ github.repository_owner }}&layout=compact&langs_count=6&locale=pt-br&hide_border=true&border_radius=14&bg_color=0a1a2f&title_color=7fd8ff&text_color=d7e6f5
+          path: profile/top-langs.svg
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Duas versões da cobrinha: uma para o tema claro e outra para o escuro.
+      # color_dots = 5 cores, da célula vazia até o dia com mais contribuições.
+      - name: Cobrinha do gráfico de contribuições
+        uses: Platane/snk/svg-only@v3
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          outputs: |
+            profile/snake-light.svg?color_snake=#0a1a2f&color_dots=#ebedf0,#c6e6ff,#7cc4ff,#2d8cff,#0b5cad
+            profile/snake-dark.svg?color_snake=#b5ecff&color_dots=#161b22,#0c3354,#145d96,#2d8cff,#7fd8ff
+
+      - name: Commitar as imagens (só se algo mudou)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add profile/*.svg
+          git commit -m "chore: atualiza imagens do perfil" || exit 0
+          git push

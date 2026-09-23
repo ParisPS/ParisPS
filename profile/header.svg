@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320" role="img" aria-labelledby="titulo descricao">
+  <title id="titulo">Banner do perfil</title>
+  <desc id="descricao">Banner do perfil com nome, stack e uma esfera holográfica girando.</desc>
+
+  <style>
+    /* =========================================================
+       ✏️ CORES E FONTE — mude aqui e o banner inteiro acompanha
+       ========================================================= */
+    svg {
+      --fundo:  #050d1a;   /* canto superior esquerdo */
+      --fundo2: #0b2445;   /* canto inferior direito  */
+      --holo:   #7fd8ff;   /* linhas da esfera e detalhes */
+      --azul:   #2d8cff;   /* brilho atrás da esfera */
+      --texto:  #eaf4ff;   /* nome */
+      --suave:  #8fa9c6;   /* textos secundários */
+      --sans: 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+    }
+
+    /* ---------- textos ---------- */
+    .ola    { font-family: var(--sans); font-size: 26px; font-weight: 400; fill: var(--suave); }
+    .nome   { font-family: var(--sans); font-size: 53px; font-weight: 700; fill: var(--texto); letter-spacing: -1.5px; }
+    .stack  { font-family: var(--sans); font-size: 26px; font-weight: 400; fill: var(--suave); }
+    .status { font-family: var(--sans); font-size: 20px; font-weight: 600; fill: var(--holo); }
+
+    /* ---------- fundo ---------- */
+    .s-fundo  { stop-color: var(--fundo); }
+    .s-fundo2 { stop-color: var(--fundo2); }
+    .s-azul   { stop-color: var(--azul); }
+    .s-holo   { stop-color: var(--holo); }
+    .ponto    { fill: var(--holo); }
+    .canto    { fill: none; stroke: var(--holo); stroke-width: 1.5; opacity: .45; }
+
+    /* ---------- esfera ---------- */
+    .linha  { fill: none; stroke: var(--holo); stroke-width: 1.2; opacity: .5; }
+    .forte  { stroke-width: 1.8; opacity: .95; }
+    .fraca  { opacity: .3; }
+    .anel   { fill: none; stroke: var(--holo); stroke-width: 1; opacity: .3; }
+    .fluxo  { fill: none; stroke: var(--holo); stroke-width: 3; stroke-linecap: round;
+              stroke-dasharray: 0.1 23; opacity: .9; animation: fluir 7s linear infinite; }
+
+    /* Os meridianos são círculos "achatados" com scaleX.
+       Animando scaleX de 1 → 0 → -1 → 0 → 1 com easing senoidal,
+       cada círculo imita uma linha girando em volta do eixo — ilusão de 3D. */
+    .meridiano {
+      fill: none; stroke: var(--holo); stroke-width: 1.2; opacity: .65;
+      transform-box: fill-box; transform-origin: center;
+      animation: girar 18s infinite;
+    }
+    .m0 { transform: scaleX(1);     animation-delay: 0s;    }
+    .m1 { transform: scaleX(.866);  animation-delay: -1.5s; }
+    .m2 { transform: scaleX(.5);    animation-delay: -3s;   }
+    .m3 { transform: scaleX(0);     animation-delay: -4.5s; }
+    .m4 { transform: scaleX(-.5);   animation-delay: -6s;   }
+    .m5 { transform: scaleX(-.866); animation-delay: -7.5s; }
+
+    .nucleo { transform-box: fill-box; transform-origin: center; animation: pulsar 4.5s ease-in-out infinite; }
+    .led    { fill: var(--holo); animation: piscar 2.4s ease-in-out infinite; }
+
+    @keyframes girar {
+      0%   { transform: scaleX(1);  animation-timing-function: cubic-bezier(.12, 0, .39, 0); }
+      25%  { transform: scaleX(0);  animation-timing-function: cubic-bezier(.61, 1, .88, 1); }
+      50%  { transform: scaleX(-1); animation-timing-function: cubic-bezier(.12, 0, .39, 0); }
+      75%  { transform: scaleX(0);  animation-timing-function: cubic-bezier(.61, 1, .88, 1); }
+      100% { transform: scaleX(1); }
+    }
+    @keyframes pulsar { 0%, 100% { opacity: .55; transform: scale(.9); } 50% { opacity: 1; transform: scale(1.08); } }
+    @keyframes piscar { 50% { opacity: .2; } }
+    @keyframes fluir  { to { stroke-dashoffset: -230.1; } }
+
+    /* Quem pede "reduzir movimento" no sistema vê a esfera parada */
+    @media (prefers-reduced-motion: reduce) {
+      .meridiano, .nucleo, .led, .fluxo { animation: none; }
+    }
+  </style>
+
+  <defs>
+    <linearGradient id="grad-fundo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" class="s-fundo"/>
+      <stop offset="1" class="s-fundo2"/>
+    </linearGradient>
+    <radialGradient id="grad-brilho">
+      <stop offset="0" class="s-azul" stop-opacity=".35"/>
+      <stop offset="1" class="s-azul" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="grad-nucleo">
+      <stop offset="0" class="s-holo" stop-opacity=".95"/>
+      <stop offset=".35" class="s-holo" stop-opacity=".35"/>
+      <stop offset="1" class="s-azul" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="grad-mascara" cx=".8" cy=".5" r=".55">
+      <stop offset="0" stop-color="#fff" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grade" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.1" class="ponto"/>
+    </pattern>
+    <mask id="mascara-grade">
+      <rect width="1200" height="320" fill="url(#grad-mascara)"/>
+    </mask>
+    <clipPath id="cartao">
+      <rect width="1200" height="320" rx="20"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#cartao)">
+    <!-- fundo + grade de pontos que some nas bordas -->
+    <rect width="1200" height="320" fill="url(#grad-fundo)"/>
+    <rect width="1200" height="320" fill="url(#grade)" mask="url(#mascara-grade)" opacity=".35"/>
+
+    <!-- cantos estilo HUD -->
+    <path class="canto" d="M22 50 V22 H50"/>
+    <path class="canto" d="M1150 22 H1178 V50"/>
+    <path class="canto" d="M1178 270 V298 H1150"/>
+    <path class="canto" d="M50 298 H22 V270"/>
+
+    <text x="76" y="100" class="ola">Olá, eu sou</text>
+    <text x="72" y="176" class="nome">Paris Pérez Salazar</text>
+    <text x="76" y="224" class="stack">Desenvolvo com TypeScript, React, Next.js e Python.</text>
+    <circle cx="84" cy="262" r="5" class="led"/>
+    <text x="100" y="269" class="status">Construindo a SARAH, minha assistente pessoal de IA</text>
+
+    <!-- esfera holográfica -->
+    <g transform="translate(962 160)">
+      <circle r="190" fill="url(#grad-brilho)"/>
+
+      <g transform="rotate(-18)">
+        <!-- anel de órbita: um fixo e um tracejado que "flui" -->
+        <g transform="scale(1 .26)">
+          <circle r="176" class="anel" vector-effect="non-scaling-stroke"/>
+          <circle r="176" class="fluxo" vector-effect="non-scaling-stroke"/>
+        </g>
+
+        <!-- paralelos (fixos) -->
+        <ellipse cy="-97" rx="56"  ry="10" class="linha fraca"/>
+        <ellipse cy="-56" rx="97"  ry="17" class="linha"/>
+        <ellipse cy="0"   rx="112" ry="20" class="linha"/>
+        <ellipse cy="56"  rx="97"  ry="17" class="linha"/>
+        <ellipse cy="97"  rx="56"  ry="10" class="linha fraca"/>
+
+        <!-- meridianos (giram) -->
+        <circle r="112" class="meridiano m0"/>
+        <circle r="112" class="meridiano m1"/>
+        <circle r="112" class="meridiano m2"/>
+        <circle r="112" class="meridiano m3"/>
+        <circle r="112" class="meridiano m4"/>
+        <circle r="112" class="meridiano m5"/>
+
+        <!-- contorno + núcleo -->
+        <circle r="112" class="linha forte"/>
+        <circle r="46" fill="url(#grad-nucleo)" class="nucleo"/>
+      </g>
+    </g>
+  </g>
+</svg>
